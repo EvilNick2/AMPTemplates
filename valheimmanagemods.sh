@@ -33,13 +33,16 @@ parse_entry() {
     ns="${BASH_REMATCH[2]}"; name="${BASH_REMATCH[3]}"
   elif [[ "$line" =~ ^([A-Za-z0-9_]+)/([A-Za-z0-9_.-]+)$ ]]; then
     ns="${BASH_REMATCH[1]}"; name="${BASH_REMATCH[2]}"
-    if [[ "$name" =~ ^(.+)-([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then name="${BASH_REMATCH[1]}"; ver="${BASH_REMATCH[2]}"; fi
   elif [[ "$line" =~ ^([A-Za-z0-9_]+)/([A-Za-z0-9_.-]+)/([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
     ns="${BASH_REMATCH[1]}"; name="${BASH_REMATCH[2]}"; ver="${BASH_REMATCH[3]}"
   elif [[ "$line" =~ ^([A-Za-z0-9_]+)-(.+)-([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
     ns="${BASH_REMATCH[1]}"; name="${BASH_REMATCH[2]}"; ver="${BASH_REMATCH[3]}"
   else
     echo "!! Unrecognised Thunderstore mod entry: $line" >&2; exit 1
+  fi
+  # A version can also be appended to the name, e.g. Namespace/Name-1.2.3
+  if [[ -z "$ver" && "$name" =~ ^(.+)-([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+    name="${BASH_REMATCH[1]}"; ver="${BASH_REMATCH[2]}"
   fi
   if [[ -n "$ver" && ! "$ver" =~ $VER_RE ]]; then
     echo "!! Invalid version '$ver' in entry: $line" >&2; exit 1
