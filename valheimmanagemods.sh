@@ -119,27 +119,33 @@ install_pkg() {
     rel="${f#"$x"/}"; new="$x/${rel//\\//}"; mkdir -p "$(dirname "$new")"; mv "$f" "$new"
   done
   rm -f "$x"/{manifest.json,icon.png,README.md,CHANGELOG.md}
+  # Some zips ship world-writable modes
+  chmod -R u+rwX,go+rX,go-w "$x"
+
+  # A BepInEx/ tree is handled like the flat layout so the mod still gets its own folder
+  if [[ -d "$x/BepInEx" ]]; then
+    for f in plugins config patchers; do
+      if [[ -d "$x/BepInEx/$f" ]]; then mkdir -p "$x/$f"; cp -R "$x/BepInEx/$f/." "$x/$f/"; fi
+    done
+    rm -rf "$x/BepInEx"
+  fi
 
   local dest="$PLUGINS/${id//\//-}"
   rm -rf "$dest"
 
-  if [[ -d "$x/BepInEx" ]]; then
-    cp -a "$x/BepInEx/." "$BEPINEX/"
-  else
-    [[ "$id" =~ $NOCONFIG_RE ]] && rm -rf "$x/config"
-    if [[ -d "$x/config" ]]; then
-      # Never overwrite existing configs
-      (cd "$x/config" && find . -type f) | while read -r f; do
-        [[ -e "$BEPINEX/config/$f" ]] || install -D -m 644 "$x/config/$f" "$BEPINEX/config/$f"
-      done
-      rm -rf "$x/config"
-    fi
-    if [[ -d "$x/patchers" ]]; then cp -a "$x/patchers/." "$BEPINEX/patchers/"; rm -rf "$x/patchers"; fi
-    mkdir -p "$dest"
-    if [[ -d "$x/plugins" ]]; then cp -a "$x/plugins/." "$dest/"; rm -rf "$x/plugins"; fi
-    cp -a "$x/." "$dest/"
-    rmdir "$dest" 2>/dev/null || true
+  [[ "$id" =~ $NOCONFIG_RE ]] && rm -rf "$x/config"
+  if [[ -d "$x/config" ]]; then
+    # Never overwrite existing configs
+    (cd "$x/config" && find . -type f) | while read -r f; do
+      [[ -e "$BEPINEX/config/$f" ]] || install -D -m 644 "$x/config/$f" "$BEPINEX/config/$f"
+    done
+    rm -rf "$x/config"
   fi
+  if [[ -d "$x/patchers" ]]; then cp -R "$x/patchers/." "$BEPINEX/patchers/"; rm -rf "$x/patchers"; fi
+  mkdir -p "$dest"
+  if [[ -d "$x/plugins" ]]; then cp -R "$x/plugins/." "$dest/"; rm -rf "$x/plugins"; fi
+  cp -R "$x/." "$dest/"
+  rmdir "$dest" 2>/dev/null || true
   # Loose copies of the same DLLs directly in plugins/ would load twice
   if [[ -d "$dest" ]]; then
     while read -r f; do
