@@ -115,7 +115,7 @@
         "UpdateSourcePlatform": "Linux",
         "UpdateSource": "Executable",
         "UpdateSourceData": "/bin/bash",
-        "UpdateSourceArgs": "-c \"if [ -s ./Valheim/thunderstore-mods.txt ] || [ -s ./Valheim/896660/BepInEx/plugins/.thunderstore-versions ]; then wget -qO managemods.sh https://raw.githubusercontent.com/EvilNick2/AMPTemplates/feat/valheim-thunderstore-mods/valheimmanagemods.sh && bash ./managemods.sh \\\"{{bepinex_install}}\\\" \\\"{{valheim_plus_install}}\\\"; fi\"",
+        "UpdateSourceArgs": "-c \"if [ -s ./Valheim/thunderstore-mods.txt ] || [ -s ./Valheim/896660/BepInEx/plugins/.thunderstore-versions ]; then wget -qO managemods.sh https://raw.githubusercontent.com/EvilNick2/AMPTemplates/valheim-thunderstore-mods/valheimmanagemods.sh && bash ./managemods.sh \\\"{{bepinex_install}}\\\" \\\"{{valheim_plus_install}}\\\"; fi\"",
         "SkipOnFailure": false
     },
     {
