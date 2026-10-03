@@ -1,7 +1,7 @@
 #!/bin/bash
 # Installs, updates and removes the Thunderstore mods listed in the "Thunderstore Mods" setting.
 # Usage: ./managemods.sh <bepinex_install> <valheim_plus_install>
-# Each list line is Namespace/Name, Namespace-Name-1.2.3 or a thunderstore.io package URL.
+# Each list line is Namespace/Name, Namespace/Name-1.2.3, Namespace-Name-1.2.3 or a thunderstore.io package URL.
 # A version in the line pins the mod to it, otherwise the latest version is installed.
 set -euo pipefail
 
@@ -33,6 +33,9 @@ parse_entry() {
     ns="${BASH_REMATCH[2]}"; name="${BASH_REMATCH[3]}"
   elif [[ "$line" =~ ^([A-Za-z0-9_]+)/([A-Za-z0-9_.-]+)$ ]]; then
     ns="${BASH_REMATCH[1]}"; name="${BASH_REMATCH[2]}"
+    if [[ "$name" =~ ^(.+)-([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then name="${BASH_REMATCH[1]}"; ver="${BASH_REMATCH[2]}"; fi
+  elif [[ "$line" =~ ^([A-Za-z0-9_]+)/([A-Za-z0-9_.-]+)/([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+    ns="${BASH_REMATCH[1]}"; name="${BASH_REMATCH[2]}"; ver="${BASH_REMATCH[3]}"
   elif [[ "$line" =~ ^([A-Za-z0-9_]+)-(.+)-([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
     ns="${BASH_REMATCH[1]}"; name="${BASH_REMATCH[2]}"; ver="${BASH_REMATCH[3]}"
   else
